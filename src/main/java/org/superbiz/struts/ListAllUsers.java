@@ -17,16 +17,25 @@
  */
 package org.superbiz.struts;
 
+import org.springframework.stereotype.Component;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.List;
 import java.util.Properties;
 
+@Component
 public class ListAllUsers {
 
-    private int id;
+    private long id;
     private String errorMessage;
     private List<User> users;
+
+    private final UserService service;
+
+    public ListAllUsers(UserService service) {
+        this.service = service;
+    }
 
     public List<User> getUsers() {
         return users;
@@ -44,23 +53,17 @@ public class ListAllUsers {
         this.errorMessage = errorMessage;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
     public String execute() {
 
         try {
-            UserService service = null;
-            Properties props = new Properties();
-            props.put(Context.INITIAL_CONTEXT_FACTORY,
-                "org.apache.openejb.core.LocalInitialContextFactory");
-            Context ctx = new InitialContext(props);
-            service = (UserService) ctx.lookup("UserServiceImplLocal");
             this.users = service.findAll();
         } catch (Exception e) {
             this.errorMessage = e.getMessage();
